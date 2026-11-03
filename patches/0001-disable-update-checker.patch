@@ -1,0 +1,40 @@
+diff --git a/crates/ui-egui/src/dialogs/updates_ui.rs b/crates/ui-egui/src/dialogs/updates_ui.rs
+index 27f7d0c..4e4d097 100644
+--- a/crates/ui-egui/src/dialogs/updates_ui.rs
++++ b/crates/ui-egui/src/dialogs/updates_ui.rs
+@@ -47,8 +47,8 @@ impl Default for Runtime {
+ impl LightcraftApp {
+     /// Whether the app asks for a newer release when it starts (off until the desktop app turns it on).
+     #[cfg(not(target_arch = "wasm32"))]
+-    pub fn set_startup_update_check(&mut self, on: bool) {
+-        self.updates_rt.startup_check = on;
++    pub fn set_startup_update_check(&mut self, _on: bool) {
++        // The AppImage is updated by its own package manager; no check is ever asked for.
+     }
+ }
+ 
+@@ -65,21 +65,9 @@ pub(crate) fn blocks_input(app: &LightcraftApp) -> bool {
+     }
+ }
+ 
+-pub(crate) fn check(app: &mut LightcraftApp) -> Result<Value, String> {
+-    #[cfg(not(target_arch = "wasm32"))]
+-    {
+-        app.updates_rt.check_requested = true;
+-        if let Some(ctx) = &app.updates_rt.repaint {
+-            ctx.request_repaint();
+-        }
+-        Ok(Value::Null)
+-    }
+-    #[cfg(target_arch = "wasm32")]
+-    {
+-        app.updates_rt.manual_window_open = true;
+-        app.updates_rt.status_message = Some("Update check is not supported in the web browser.".into());
+-        Ok(Value::Null)
+-    }
++pub(crate) fn check(_app: &mut LightcraftApp) -> Result<Value, String> {
++    // Help > Check for Updates would offer to replace this build with an upstream release.
++    Ok(Value::Null)
+ }
+ 
+ pub(crate) fn tick(app: &mut LightcraftApp, ctx: &egui::Context) {
